@@ -1,0 +1,58 @@
+---
+title: "MLM Nested Project D"
+author: ""
+header-includes:
+   - \usepackage{todonotes}
+output:
+  pdf_document: default
+date: "Compiled on `r format(Sys.time(), '%a %b %d %H:%M %Z')`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE,tidy=TRUE)
+require(lme4)
+require(foreign)
+require(lmerTest)
+require(tidyverse)
+```
+
+# Question 1: data generating process
+
+```{r question 1}
+set.seed(2042001)
+
+# variance of the random effect
+sigma_eta_2 <- 2
+sigma_epsilon_2 <- 2
+
+# generate data
+dat <- 
+  tibble(classid = rep(c(1:100), each = 200),
+         studentid = 1:(100*200),
+         x = runif(100*200, min = 0, max = 1),
+         eta_j = rep(rnorm(100, sd = sqrt(sigma_eta_2)), each = 200),
+         epsilon = rnorm(100*200, sd = sqrt(sigma_epsilon_2)),
+         y = x + eta_j + epsilon)
+
+```
+
+# Question 2: fit the model
+
+```{r fit1}
+lmer_fit1 <- lmer(y ~ x + (1|classid), data = dat)
+summary(lmer_fit1)
+```
+
+ 2. 
+  a. The estimated coefficient of X is 0.986.
+  b. The 95% confidence interval for this coefficient estimate is $[0.986-1.96*0.035, 0.986+1.96*0.035] =$ $[$ `r 0.986-1.96*0.035`$,$ `r 0.986+1.96*0.035`$]$ covers the true coefficient, which is 1.
+
+# Question 3: 
+
+# Question 4: 
+
+# Question 5: 
+
+
+
+
