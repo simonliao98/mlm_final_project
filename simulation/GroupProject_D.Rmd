@@ -1,6 +1,6 @@
 ---
 title: "MLM Nested Project D"
-author: ""
+author: "Xinming Dai, Chongjun Liao, Jeremy Lu, Yu Wang "
 header-includes:
    - \usepackage{todonotes}
 output:
@@ -16,7 +16,7 @@ require(lmerTest)
 require(tidyverse)
 ```
 
-# Question 1: data generating process
+## Question 1: data generating process
 
 ```{r question 1}
 set.seed(2042001)
@@ -43,15 +43,34 @@ lmer_fit1 <- lmer(y ~ x + (1|classid), data = dat)
 summary(lmer_fit1)
 ```
 
- 2. 
+## Question 2: 
   a. The estimated coefficient of X is 0.986.
-  b. The 95% confidence interval for this coefficient estimate is $[0.986-1.96*0.035, 0.986+1.96*0.035] =$ $[$ `r 0.986-1.96*0.035`$,$ `r 0.986+1.96*0.035`$]$ covers the true coefficient, which is 1.
+  b. The 95% confidence interval for this coefficient estimate is $[0.986-1.96*0.035, 0.986+1.96*0.035] =$ $[$ `r 0.986-1.96*0.035`$,$ `r 0.986+1.96*0.035`$]$ cover the true coefficient, which is 1.
 
-# Question 3: 
+## Question 3: 
 
-# Question 4: 
+## Question 4: 
+```{r}
+# 4a
+z <- rbinom(100*200,1,dat$x)
+# 4b
+dat$y_q4 <- ifelse(z==1,NA,dat$y)
+# 4c
+lmer_fit_mar <- lmer(y_q4 ~ x + (1|classid), data = dat)
+summary(lmer_fit_mar)
+```
 
-# Question 5: 
+### d.
+  i. The 95% confidence interval is [`r round(as.data.frame(coef(summary(lmer_fit_mar)))[2,1]-1.96*as.data.frame(coef(summary(lmer_fit_mar)))[2,2],3)`,`r round(as.data.frame(coef(summary(lmer_fit_mar)))[2,1]+1.96*as.data.frame(coef(summary(lmer_fit_mar)))[2,2],3)`], which covers the "truth".  
+  
+### e.
+```{r}
+N <- sum(z==0)
+```
+We use N = `r N` samples in the model fit.
+
+
+## Question 5: 
 
 
 
