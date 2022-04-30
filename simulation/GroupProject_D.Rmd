@@ -68,11 +68,11 @@ N_Q3
 ```
 
 ### e.
-  The estimate coefficient is 0.978, which is a little bit smaller than the previous fit.
-  The 95% CI is $[0.9576-1.96*0.05, 0.978+1.96*0.05]$, which is $[0.86, 1.08]$ converges to the true value.
+  The estimate coefficient is 1.02, which changes a little bit
+  The 95% CI is $[1.02-1.96*0.05, 1.02+1.96*0.05]$, which is $[0.92, 1.12]$ almost converges to the true value
 
 ### f.
-  The total total sample size used in this Question is 10064
+  The total sample size used in this Question is 9945
   
 
 ## Question 4: 
