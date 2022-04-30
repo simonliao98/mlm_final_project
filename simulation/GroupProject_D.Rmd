@@ -45,7 +45,7 @@ summary(lmer_fit1)
 
 ## Question 2: 
   a. The estimated coefficient of X is 0.986.
-  b. The 95% confidence interval for this coefficient estimate is $[0.986-1.96*0.035, 0.986+1.96*0.035] =$ $[$ `r 0.986-1.96*0.035`$,$ `r 0.986+1.96*0.035`$]$ cover the true coefficient, which is 1.
+  b. The 95% confidence interval for this coefficient estimate is $[0.986-1.96*0.035, 0.986+1.96*0.035] =$ $[$ `r 0.986-1.96*0.035`$,$ `r 0.986+1.96*0.035`$]$. It covers the true coefficient, which is 1.
 
 ## Question 3: 
 
