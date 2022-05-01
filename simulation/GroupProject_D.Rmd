@@ -54,6 +54,7 @@ dat_copy <- dat
 
 # 3b
 Z_Q3 <- rbinom(20000, 1, 0.5)
+table(Z_Q3)
 
 # 3c
 dat_copy <- dat_copy %>% mutate(y = replace(y, 1:n(), ifelse(Z_Q3==1, NA, y)))
@@ -79,6 +80,7 @@ N_Q3
 ```{r}
 # 4a
 z <- rbinom(100*200,1,dat$x)
+table(z)
 # 4b
 dat$y_q4 <- ifelse(z==1,NA,dat$y)
 # 4c
