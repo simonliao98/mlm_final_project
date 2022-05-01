@@ -111,7 +111,7 @@ summary(lmer_fit_5)
 The new estimate for slope is `r round(as.data.frame(coef(summary(lmer_fit_5)))[2,1], 3)`.
 
 ### e
-The 95% confidence interval is [`r round(as.data.frame(coef(summary(lmer_fit_5)))[2,1]-1.96*as.data.frame(coef(summary(lmer_fit_5)))[2,2],3)`,`r round(as.data.frame(coef(summary(lmer_fit_5)))[2,1]+1.96*as.data.frame(coef(summary(lmer_fit_5)))[2,2],3)`], which does not cover the "truth".  
+The 95% confidence interval is [`r round(as.data.frame(coef(summary(lmer_fit_5)))[2,1]-1.96*as.data.frame(coef(summary(lmer_fit_5)))[2,2],3)`,`r round(as.data.frame(coef(summary(lmer_fit_5)))[2,1]+1.96*as.data.frame(coef(summary(lmer_fit_5)))[2,2],3)`], which does not cover the "truth", besides the intercept also change.  
 
 ### f
 The total sample size is `r nrow(dat_copy_5)-sum(is.na(dat_copy_5$y))`, based on number of observations.
