@@ -1,5 +1,5 @@
 ---
-  title: "MLM Nested Project D"
+title: "MLM Nested Project D"
 author: "Xinming Dai, Chongjun Liao, Jeremy Lu, Yu Wang "
 header-includes:
   - \usepackage{todonotes}
@@ -8,7 +8,7 @@ output:
 date: "Compiled on `r format(Sys.time(), '%a %b %d %H:%M %Z')`"
 ---
   
-  ```{r setup, include=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=TRUE,tidy=TRUE)
 require(lme4)
 require(foreign)
@@ -72,21 +72,22 @@ The total sample size used in this Question is 9945
 ## Question 4: 
 ```{r}
 # 4a
-z <- rbinom(100*200,1,dat$x)
+dat_copy_4 <- dat
+z <- rbinom(100*200,1,dat_copy_4$x)
 table(z)
 # 4b
-dat$y_q4 <- ifelse(z==1,NA,dat$y)
+dat_copy_4$y <- ifelse(z==1,NA,dat_copy_4$y)
 # 4c
-lmer_fit_mar <- lmer(y_q4 ~ x + (1|classid), data = dat)
-summary(lmer_fit_mar)
+lmer_fit_4 <- lmer(y ~ x + (1|classid), data = dat_copy_4)
+summary(lmer_fit_4)
 ```
 
 ### d.
-i. The 95% confidence interval is [`r round(as.data.frame(coef(summary(lmer_fit_mar)))[2,1]-1.96*as.data.frame(coef(summary(lmer_fit_mar)))[2,2],3)`,`r round(as.data.frame(coef(summary(lmer_fit_mar)))[2,1]+1.96*as.data.frame(coef(summary(lmer_fit_mar)))[2,2],3)`], which covers the "truth".  
+i. The 95% confidence interval is [`r round(as.data.frame(coef(summary(lmer_fit_4)))[2,1]-1.96*as.data.frame(coef(summary(lmer_fit_4)))[2,2],3)`,`r round(as.data.frame(coef(summary(lmer_fit_4)))[2,1]+1.96*as.data.frame(coef(summary(lmer_fit_4)))[2,2],3)`], which covers the "truth".  
 
 ### e.
 ```{r}
-N <- sum(z==0)
+N <- nrow(dat)-sum(is.na(dat_copy_4$y))
 ```
 We use N = `r N` samples in the model fit.
 
@@ -98,8 +99,8 @@ dat_copy_5 <- dat
 expit <- function(x){exp(x)/(1+exp(x))}
 
 ### b
-z <- rbinom(100*200,1, expit(dat_copy_5$x))
-
+z <- rbinom(100*200,1, expit(dat_copy_5$y))
+table(z)
 ### c
 dat_copy_5$y <- ifelse(z==1,NA,dat_copy_5$y)
 
@@ -107,11 +108,10 @@ dat_copy_5$y <- ifelse(z==1,NA,dat_copy_5$y)
 lmer_fit_5 <- lmer(y ~ x + (1|classid), data = dat_copy_5)
 summary(lmer_fit_5)
 ```
-The new estimate for slope is 2.027.
+The new estimate for slope is `r round(as.data.frame(coef(summary(lmer_fit_5)))[2,1], 3)`.
 
 ### e
-Ummm not sure how to answer this one?
-The confidence interval is (2.026 + )
+The 95% confidence interval is [`r round(as.data.frame(coef(summary(lmer_fit_5)))[2,1]-1.96*as.data.frame(coef(summary(lmer_fit_5)))[2,2],3)`,`r round(as.data.frame(coef(summary(lmer_fit_5)))[2,1]+1.96*as.data.frame(coef(summary(lmer_fit_5)))[2,2],3)`], which does not cover the "truth".  
 
 ### f
-The total sample size is 7606, based on number of observations.
+The total sample size is `r nrow(dat_copy_5)-sum(is.na(dat_copy_5$y))`, based on number of observations.
