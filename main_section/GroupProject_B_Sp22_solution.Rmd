@@ -1,0 +1,54 @@
+---
+title: "MLM Nested Main Section"
+author: "Xinming Dai; Checked by Chongjun Liao, Jeremy Lu, Yu Wang "
+header-includes:
+   - \usepackage{todonotes}
+output:
+  pdf_document: default
+date: "Compiled on `r format(Sys.time(), '%a %b %d %H:%M %Z')`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE,tidy=TRUE)
+require(lme4)
+require(foreign)
+require(lmerTest)
+require(tidyverse)
+```
+
+## Question 0: read data and process missingness
+
+```{r question 0}
+dat <- read.dta("classroom.dta")
+
+# construct new outcome math1st
+dat <- 
+  dat %>% 
+  mutate(math1st = mathkind + mathgain)
+
+# remove missing data
+dat <- 
+  dat %>% 
+  filter(complete.cases(dat))
+```
+
+## Question 1
+```{r question 1}
+# fit a model
+fit1 <- lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (1|schoolid/classid), data = dat)
+summary(fit1)
+
+# plot residuals to test normality assumption
+res1 <- residuals(fit1)
+qqnorm(res1, pch = 1, frame = FALSE)
+qqline(res1, col = "steelblue", lwd = 2)
+```
+
+QQ plot shows that plots are around the line, and thus we believe the normality assumption holds.
+
+## Question 2
+
+```{r question 2}
+
+
+```
