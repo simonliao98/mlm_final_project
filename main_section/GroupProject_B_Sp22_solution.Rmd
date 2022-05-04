@@ -58,7 +58,7 @@ qqnorm(eta0_fit1, pch = 1, frame = FALSE, main = "Normal Q-Q plot for eta0")
 qqline(eta0_fit1, col = "steelblue", lwd = 2)
   
 # examine normality for zeta0 (school-level)
-zeta0_fit1 <- blups_fit1$`classid:schoolid`$`(Intercept)`
+zeta0_fit1 <- blups_fit1$schoolid$`(Intercept)`
 qqnorm(zeta0_fit1, pch = 1, frame = FALSE, main = "Normal Q-Q plot for zeta0")
 qqline(zeta0_fit1, col = "red", lwd = 2)
 par(mfrow=c(1,1))  
@@ -69,10 +69,10 @@ QQ plot shows that both sets of BLUPs of zeta0 and eta0 are around the line, and
 ## Question 3
 
 ```{r question 3}
-fit2 <- lmer(mathgain ~ mathkind + ses + minority + yearstea + (yearstea | schoolid), data = dat)
-math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (minority|schoolid)
-
-print(summary(fit3))
+# fit2 <- lmer(mathgain ~ mathkind + ses + minority + yearstea + (yearstea | schoolid), data = dat)
+# math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (minority|schoolid)
+# 
+# print(summary(fit3))
 
 ```
 
