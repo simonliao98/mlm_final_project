@@ -37,12 +37,15 @@ dat <-
 
 ```{r fit1}
 lmer_fit1 <- lmer(y ~ x + (1|classid), data = dat)
-summary(lmer_fit1)
+summary_lmer_fit1 <- summary(lmer_fit1)
+summary_lmer_fit1
+estimate_x <- summary_lmer_fit1$coefficients[2, 1]
+se_x <- summary_lmer_fit1$coefficients[2, 2]
 ```
 
 ## Question 2: 
 a. The estimated coefficient of X is 0.986.
-b. The 95% confidence interval for this coefficient estimate is $[0.986-1.96*0.035, 0.986+1.96*0.035] =$ $[$ `r 0.986-1.96*0.035`$,$ `r 0.986+1.96*0.035`$]$. It covers the true coefficient, which is 1.
+b. The 95% confidence interval for this coefficient estimate is $[0.986-1.96*0.035, 0.986+1.96*0.035] = [`r round(estimate_x-1.96*se_x, 4)`, `r round(estimate_x+1.96*se_x, 4)`]$. It covers the true coefficient, which is 1.
 
 ## Question 3: 
 ```{r}
