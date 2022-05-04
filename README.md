@@ -12,5 +12,5 @@ There are two parts of the project.
 * A1: Chongjun Liao
 * A2: Jeremy Lu
 * B: Xinming Dai
-* C: Yu Wang).  
+* C: Yu Wang
 ### Simulation (D)
