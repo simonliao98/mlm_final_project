@@ -65,7 +65,7 @@ N_Q3
 ```
 
 ### e.
-The estimate coefficient is 1.02, which changes a little bit
+The estimate coefficient is 1.02, which does not change too much
 The 95% CI is $[1.02-1.96*0.05, 1.02+1.96*0.05]$, which is $[0.92, 1.12]$ almost converges to the true value
 
 ### f.
