@@ -1,0 +1,135 @@
+---
+title: "Project A - Model Selection and Notation"
+author: "Chongjun Liao"
+date: "5/7/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(lme4)
+library(lmerTest)
+library(dplyr)
+library(aod)
+```
+
+0. We will use the classroom.csv data for this project. 
+  a. math1st will be the outcome of interest for this first part  
+    i. Recall that `math1st = mathkind + mathgain` 
+  b. Read in the data (R: store as `dat`) 
+  c. Fit all models using REML 
+  d. It’s best if you use `lmerTest::lmer` rather than `lme4::lmer` to call the MLM function. The former provides p-values for fixed effects in the summary. 
+  e. There are 2 common error messages one can get from lmer calls: failed to converge (problem with hessian: negative eigenvalue; max|grad| = ...); and singularity. They may both be problematic in a real problem, but the latter suggests that a variance component is on the boundary of the parameter space.  
+    1. In your discussion/writeup, consider the latter to be a “convergence problem” and ignore the former. 
+```{r}
+dat <- read.csv("~/Documents/GitHub/mlm_final_project/data/classroom.csv")
+dat <- dat %>% 
+  mutate(math1st = mathkind + mathgain)
+```
+1. Estimate an Unconditional Means Model (UMM) with random intercepts for both schools and classrooms (nested in schools).  
+
+```{r q1}
+fit1 <- lmer( math1st ~ (1 | schoolid/classid), dat)
+summary(fit1)
+```
+
+  a. Report the ICC for schools and the ICC for classrooms 
+  **Answer:** The ICC for schools is `r as.data.frame(VarCorr(fit1))$vcov[2]/as.data.frame(VarCorr(fit1))$vcov[3]` and the ICC for classrooms is `r as.data.frame(VarCorr(fit1))$vcov[1]/as.data.frame(VarCorr(fit1))$vcov[3]`.  
+  b. **WRITE OUT THIS MODEL** using your preferred notation, but use the same choice of notation for the remainder of your project 
+      i. Be mindful and explicit about any assumptions made. 
+      $MATH1ST_{ijk} = {b_0} + \zeta _{0k} + \eta _{0jk}+ {\varepsilon _{ijk}}$, with
+    ${\zeta_{0k}}\sim N(0,\sigma_{\zeta_0}^2)$,
+    $\eta _{0jk} \sim N(0,\sigma_{\eta_0}^2)$ and 
+    ${\varepsilon_{ijk}}\sim N(0,\sigma_\varepsilon^2)$, 
+    independently of one another, *j*
+    represents classrooms and *k*
+    represents *schools*.
+2. ADD ALL School level predictors 
+```{r q2}
+fit1 <- lmer( math1st ~ (1 | schoolid/classid), dat)
+fit2 <- lmer( math1st ~ housepov + (1 | schoolid/classid), dat)
+summary(fit2)
+anova(fit1,fit2)
+```
+  a. Report if adding the predictors as a block is justified 
+  There is only one school-level predictor which is `housepov`, its p-value is `r summary(fit2)$coef["housepov",'Pr(>|t|)']` < 0.05, and I do a LRT on model with and without the school-level predictor, the p-value is `r anova(fit1,fit2)[,'Pr(>Chisq)'][2]` < 0.05. So it is reasonable to add school-level predictor.
+  b. Report change in $\sigma_\zeta^2$. 
+  The change in $\sigma_\zeta^2$ is `r as.data.frame(VarCorr(fit1))$vcov[2]`-`r as.data.frame(VarCorr(fit2))$vcov[2]` = `r as.data.frame(VarCorr(fit1))$vcov[2] - as.data.frame(VarCorr(fit2))$vcov[2]`.
+3. ADD ALL Classroom level predictors 
+```{r q3}
+save.options = options()
+options(na.action = "na.pass")
+mm <- model.matrix(~math1st + ses + mathknow, data = dat)
+in_sample <- apply(is.na(mm), 1, sum) == 0 # these rows aren't missing anything 
+options(save.options)
+# remove those na 
+fit3 <- lmer( math1st ~ yearstea + mathknow + mathprep + housepov + (1 | schoolid/classid), 
+              dat, subset = in_sample)
+summary(fit3)
+wald.test(b = fixef(fit3), Sigma = summary(fit3)$vcov, Terms = 2:4)
+```
+
+  a. Report if adding the predictors as a block is justified [must use WALD test, not LRT] 
+  **Answer:** The Wald test generates a p-value = 0.22, which shows that we have no reason to add classroom-level predictors as a block. But it might be reasonable to include `mathknow` since it is significant according to the t-test.
+  b. Report change in $\sigma^2_\eta$ and change in $\sigma^2_\epsilon$. 
+  The change in $\sigma_\eta^2$ is `r as.data.frame(VarCorr(fit3))$vcov[1]`-`r as.data.frame(VarCorr(fit1))$vcov[1]` = `r as.data.frame(VarCorr(fit3))$vcov[1] - as.data.frame(VarCorr(fit1))$vcov[1]` and change in $\sigma^2_\epsilon$ is `r as.data.frame(VarCorr(fit3))$vcov[3]`-`r as.data.frame(VarCorr(fit1))$vcov[3]` = `r as.data.frame(VarCorr(fit3))$vcov[3] - as.data.frame(VarCorr(fit1))$vcov[3]`.
+  c. Give a potential reason as to why $\sigma^2_\epsilon$ is reduced, but not $\sigma^2_\eta$? 
+4. ADD (nearly) ALL student level predictors (but not `mathgain` or `mathkind`, as these are outcomes in this context). 
+```{r}
+fit4 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
+                housepov + (1 | schoolid/classid), dat, subset = in_sample)
+summary(fit4)
+wald.test(b = fixef(fit4), Sigma = summary(fit4)$vcov, Terms = 2:4)
+```
+
+  a. Report if justified statistically as a block of predictors [must use WALD test, not LRT] 
+  The wald test gives a p-value less than 0.05, which justifies the significance of adding a block of individual predictors.
+  b. Report change in variance components for all levels 
+  The change in $\sigma_\eta^2$ is `r as.data.frame(VarCorr(fit4))$vcov[1]`-`r as.data.frame(VarCorr(fit1))$vcov[1]` = `r as.data.frame(VarCorr(fit4))$vcov[1] - as.data.frame(VarCorr(fit1))$vcov[1]`, the change in $\sigma_\zeta^2$ is `r as.data.frame(VarCorr(fit4))$vcov[2]`-`r as.data.frame(VarCorr(fit1))$vcov[2]` = `r as.data.frame(VarCorr(fit4))$vcov[2] - as.data.frame(VarCorr(fit1))$vcov[2]` and change in $\sigma^2_\epsilon$ is `r as.data.frame(VarCorr(fit4))$vcov[3]`-`r as.data.frame(VarCorr(fit1))$vcov[3]` = `r as.data.frame(VarCorr(fit4))$vcov[3] - as.data.frame(VarCorr(fit1))$vcov[3]`.
+  c. Give a potential reason as to why the school level variance component drops from prior model 
+  Individual predictors are correlated with school-level effect.
+  d. WRITE OUT THIS MODEL using your chosen notation (include assumptions).  
+  $MATH1ST_{ijk} = {b_0} + b_1SES_{ijk} + b_2MINORITY_{ijk} + b_3SEX_{ijk} + b_4YEARSTEA_{jk} + b_5MATHKNOW_{jk} + b_6MATHPREP_{jk}+ b_7HOUSEPOV_{k} + \zeta _{0k} + \eta _{0jk}+ {\varepsilon _{ijk}}$, with
+    ${\zeta_{0k}}\sim N(0,\sigma_{\zeta_0}^2)$,
+    $\eta _{0jk} \sim N(0,\sigma_{\eta_0}^2)$ and 
+    ${\varepsilon_{ijk}}\sim N(0,\sigma_\varepsilon^2)$, 
+    independently of one another, *j*
+    represents classrooms and *k*
+    represents *schools*.
+5.a. Try to add a random slope for each teacher level predictor (varying at the school level; one by one separately- not all together) 
+  b. Report the model fit or lack of fit 
+```{r}
+fit5.1 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
+                housepov + (1 | schoolid/classid) + (0 + yearstea || schoolid), 
+                dat, subset = in_sample)
+summary(fit5.1)
+```
+```{r}
+fit5.2 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
+                housepov + (1 | schoolid/classid) + (0 + yearstea + mathknow || schoolid),
+                dat, subset = in_sample)
+summary(fit5.2)
+```
+```{r}
+fit5.3 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
+                housepov + (1 | schoolid/classid) + (0 + yearstea + mathknow + mathprep || schoolid), 
+                dat, subset = in_sample)
+summary(fit5.3)
+```
+  c. Retry the above, allowing the slopes to be correlated with the random intercepts (still one by one) 
+```{r}
+fit5.c.1 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
+                housepov + (1 | schoolid/classid) + (yearstea || schoolid), 
+                dat, subset = in_sample)
+fit5.c.2 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
+                housepov + (1 | schoolid/classid) + (yearstea + mathknow|| schoolid), 
+                dat, subset = in_sample)
+fit5.c.3 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
+                housepov + (1 | schoolid/classid) + (yearstea + mathknow + mathprep || schoolid), 
+                dat, subset = in_sample)
+```
+  
+  d. Report anything unusual about the variance components (changes that are in a direction you didn’t expect) and any potential explanation for why those changes occurred (hint: what did you add to the model?).  
+
+6. Question: 
+  a. Why is it a bad idea to include a classroom-level variable with random slopes at the classroom level?
