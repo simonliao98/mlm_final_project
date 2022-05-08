@@ -1,0 +1,79 @@
+---
+title: "MLM Nested Main Section B"
+author: "Xinming Dai; Checked by Chongjun Liao, Jeremy Lu, Yu Wang "
+header-includes:
+   - \usepackage{todonotes}
+output:
+  pdf_document: default
+date: "Compiled on `r format(Sys.time(), '%a %b %d %H:%M %Z')`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE,tidy=TRUE)
+require(lme4)
+require(foreign)
+require(lmerTest)
+require(tidyverse)
+```
+
+## Question 0: read data and process missingness
+
+```{r question 0}
+dat <- read.dta("classroom.dta")
+
+# construct new outcome math1st
+dat <- 
+  dat %>% 
+  mutate(math1st = mathkind + mathgain)
+
+# remove missing data
+dat <- 
+  dat %>% 
+  filter(complete.cases(dat))
+```
+
+## Question 1
+```{r question 1}
+# fit a model
+fit1 <- lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (1|schoolid/classid), data = dat)
+summary(fit1)
+
+# plot residuals to test normality assumption
+res1 <- residuals(fit1)
+qqnorm(res1, pch = 1, frame = FALSE)
+qqline(res1, col = "steelblue", lwd = 2)
+```
+
+QQ plot shows that points are around the line, and thus we believe the normality assumption holds.
+
+## Question 2
+
+```{r question 2}
+blups_fit1 <- ranef(fit1)
+
+par(mfrow=c(1,2))  
+# examine normality for eta0 (class-level)
+eta0_fit1 <- blups_fit1$`classid:schoolid`$`(Intercept)`
+qqnorm(eta0_fit1, pch = 1, frame = FALSE, main = "Normal Q-Q plot for eta0")
+qqline(eta0_fit1, col = "steelblue", lwd = 2)
+  
+# examine normality for zeta0 (school-level)
+zeta0_fit1 <- blups_fit1$schoolid$`(Intercept)`
+qqnorm(zeta0_fit1, pch = 1, frame = FALSE, main = "Normal Q-Q plot for zeta0")
+qqline(zeta0_fit1, col = "red", lwd = 2)
+par(mfrow=c(1,1))  
+```
+
+QQ plot shows that both sets of BLUPs of zeta0 and eta0 are around the line, and thus we believe the normality assumption holds.
+
+## Question 3
+
+```{r question 3}
+# fit2 <- lmer(mathgain ~ mathkind + ses + minority + yearstea + (yearstea | schoolid), data = dat)
+# math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (minority|schoolid)
+# 
+# print(summary(fit3))
+
+```
+
+
