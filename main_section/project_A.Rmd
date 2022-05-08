@@ -1,6 +1,6 @@
 ---
-  title: "Project A2 - Model Selection and Notation"
-author: "Jeremy Lu"
+title: "Project A1+A2 - Model Selection and Notation"
+author: "Chongjun Liao, Jeremy Lu"
 date: "5/7/2022"
 output: pdf_document
 ---
