@@ -5,13 +5,16 @@ date: "5/7/2022"
 output: pdf_document
 ---
   
-  ```{r setup, include=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(lme4)
 library(lmerTest)
 library(dplyr)
 library(aod)
 ```
+
+## A1
+
 
 0. We will use the classroom.csv data for this project. 
 a. math1st will be the outcome of interest for this first part  
@@ -133,7 +136,10 @@ d. Report anything unusual about the variance components (changes that are in a 
 
 6. Question: 
   a. Why is it a bad idea to include a classroom-level variable with random slopes at the classroom level?
-  
+
+
+## A2
+
 7. Question:
   a. For UMM, write down: V_S, V_C, V_E for the three variance components (simply the estimates)
  **Answer:**  We have that V_S = 280.68, V_C = 85.46, and V_E = 1146.8
