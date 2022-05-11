@@ -13,8 +13,7 @@ library(dplyr)
 library(aod)
 ```
 
-## A1
-
+## A1 Chongjun Liao
 
 0. We will use the classroom.csv data for this project. 
 a. math1st will be the outcome of interest for this first part  
@@ -36,10 +35,11 @@ fit1 <- lmer( math1st ~ (1 | schoolid/classid), dat)
 summary(fit1)
 ```
 
-a. Report the ICC for schools and the ICC for classrooms 
-**Answer:** The ICC for schools is `r as.data.frame(VarCorr(fit1))$vcov[2]/(as.data.frame(VarCorr(fit1))$vcov[2]+as.data.frame(VarCorr(fit1))$vcov[3])` and the ICC for classrooms is `r as.data.frame(VarCorr(fit1))$vcov[1]/(as.data.frame(VarCorr(fit1))$vcov[1]+as.data.frame(VarCorr(fit1))$vcov[3])`.  
+a. Report the ICC for schools and the ICC for classrooms  
+**Answer:** The ICC for schools is $\frac{\sigma_{\zeta_0}^2}{\sigma_{\zeta_0}^2+\sigma_\varepsilon^2}=$`r as.data.frame(VarCorr(fit1))$vcov[2]/(as.data.frame(VarCorr(fit1))$vcov[2]+as.data.frame(VarCorr(fit1))$vcov[3])` and the ICC for classrooms is $\frac{\sigma_{\eta_0}^2}{\sigma_{\eta_0}^2+\sigma_\varepsilon^2}=$`r as.data.frame(VarCorr(fit1))$vcov[1]/(as.data.frame(VarCorr(fit1))$vcov[1]+as.data.frame(VarCorr(fit1))$vcov[3])`.  
 b. **WRITE OUT THIS MODEL** using your preferred notation, but use the same choice of notation for the remainder of your project 
-i. Be mindful and explicit about any assumptions made. 
+i. Be mindful and explicit about any assumptions made.  
+
 $MATH1ST_{ijk} = {b_0} + \zeta _{0k} + \eta _{0jk}+ {\varepsilon _{ijk}}$, with
 ${\zeta_{0k}}\sim N(0,\sigma_{\zeta_0}^2)$,
 $\eta _{0jk} \sim N(0,\sigma_{\eta_0}^2)$ and 
@@ -53,9 +53,9 @@ fit2 <- lmer( math1st ~ housepov + (1 | schoolid/classid), dat)
 summary(fit2)
 anova(fit1,fit2)
 ```
-a. Report if adding the predictors as a block is justified 
-There is only one school-level predictor which is `housepov`, its p-value is `r summary(fit2)$coef["housepov",'Pr(>|t|)']` < 0.05, and I do a LRT on model with and without the school-level predictor, the p-value is `r anova(fit1,fit2)[,'Pr(>Chisq)'][2]` < 0.05. So it is reasonable to add school-level predictor.
-b. Report change in $\sigma_\zeta^2$. 
+a. Report if adding the predictors as a block is justified  
+**Answer: **There is only one school-level predictor which is `housepov`, its p-value is `r summary(fit2)$coef["housepov",'Pr(>|t|)']` < 0.05, and I do a LRT on model with and without the school-level predictor, the p-value is `r anova(fit1,fit2)[,'Pr(>Chisq)'][2]` < 0.05. So it is reasonable to add school-level predictor.
+b. Report change in $\sigma_\zeta^2$.  
 The change in $\sigma_\zeta^2$ is `r as.data.frame(VarCorr(fit1))$vcov[2]`-`r as.data.frame(VarCorr(fit2))$vcov[2]` = `r as.data.frame(VarCorr(fit1))$vcov[2] - as.data.frame(VarCorr(fit2))$vcov[2]`.
 3. ADD ALL Classroom level predictors 
 ```{r q3}
@@ -71,13 +71,14 @@ summary(fit3)
 wald.test(b = fixef(fit3), Sigma = summary(fit3)$vcov, Terms = 2:4)
 ```
 
-a. Report if adding the predictors as a block is justified [must use WALD test, not LRT] 
-**Answer:** The Wald test generates a p-value = 0.22, which shows that we have no reason to add classroom-level predictors as a block. But it might be reasonable to include `mathknow` since it is significant according to the t-test.
-b. Report change in $\sigma^2_\eta$ and change in $\sigma^2_\epsilon$. 
-The change in $\sigma_\eta^2$ is `r as.data.frame(VarCorr(fit3))$vcov[1]`-`r as.data.frame(VarCorr(fit1))$vcov[1]` = `r as.data.frame(VarCorr(fit3))$vcov[1] - as.data.frame(VarCorr(fit1))$vcov[1]` and change in $\sigma^2_\epsilon$ is `r as.data.frame(VarCorr(fit3))$vcov[3]`-`r as.data.frame(VarCorr(fit1))$vcov[3]` = `r as.data.frame(VarCorr(fit3))$vcov[3] - as.data.frame(VarCorr(fit1))$vcov[3]`.
-c. Give a potential reason as to why $\sigma^2_\epsilon$ is reduced, but not $\sigma^2_\eta$? 
+a. Report if adding the predictors as a block is justified [must use WALD test, not LRT]  
+**Answer:** The Wald test generates a p-value = 0.32, which shows that we have no reason to add classroom-level predictors as a block. But it might be reasonable to include `mathknow` since it is significant according to the t-test.
 
-A potential might be, the same teacher (same classroom)might have different effect on each student, therefore when we introduce a classroom-level fix effect, the model does not reduces classroom-level random effect, instead, reduces individual-level effect.
+b. Report change in $\sigma^2_\eta$ and change in $\sigma^2_\epsilon$.  
+**Answer:** The change in $\sigma_\eta^2$ is `r as.data.frame(VarCorr(fit3))$vcov[1]`-`r as.data.frame(VarCorr(fit2))$vcov[1]` = `r as.data.frame(VarCorr(fit3))$vcov[1] - as.data.frame(VarCorr(fit2))$vcov[1]` and change in $\sigma^2_\epsilon$ is `r as.data.frame(VarCorr(fit3))$vcov[3]`-`r as.data.frame(VarCorr(fit2))$vcov[3]` = `r as.data.frame(VarCorr(fit3))$vcov[3] - as.data.frame(VarCorr(fit2))$vcov[3]`.
+c. Give a potential reason as to why $\sigma^2_\epsilon$ is reduced, but not $\sigma^2_\eta$?  
+
+A potential might be, the same teacher (same classroom)might have different effect on each student, therefore when we introduce a classroom-level fix effect, the model does not reduces classroom-level random effect, instead, reduces individual-level effect and inflated classroom-level random effect.
 
   4. ADD (nearly) ALL student level predictors (but not `mathgain` or `mathkind`, as these are outcomes in this context). 
 ```{r}
@@ -87,21 +88,26 @@ summary(fit4)
 wald.test(b = fixef(fit4), Sigma = summary(fit4)$vcov, Terms = 2:4)
 ```
 
-a. Report if justified statistically as a block of predictors [must use WALD test, not LRT] 
-The wald test gives a p-value less than 0.05, which justifies the significance of adding a block of individual predictors.
-b. Report change in variance components for all levels 
-The change in $\sigma_\eta^2$ is `r as.data.frame(VarCorr(fit4))$vcov[1]`-`r as.data.frame(VarCorr(fit1))$vcov[1]` = `r as.data.frame(VarCorr(fit4))$vcov[1] - as.data.frame(VarCorr(fit1))$vcov[1]`, the change in $\sigma_\zeta^2$ is `r as.data.frame(VarCorr(fit4))$vcov[2]`-`r as.data.frame(VarCorr(fit1))$vcov[2]` = `r as.data.frame(VarCorr(fit4))$vcov[2] - as.data.frame(VarCorr(fit1))$vcov[2]` and change in $\sigma^2_\epsilon$ is `r as.data.frame(VarCorr(fit4))$vcov[3]`-`r as.data.frame(VarCorr(fit1))$vcov[3]` = `r as.data.frame(VarCorr(fit4))$vcov[3] - as.data.frame(VarCorr(fit1))$vcov[3]`.
-c. Give a potential reason as to why the school level variance component drops from prior model 
-Individual predictors are correlated with school-level effect.
+a. Report if justified statistically as a block of predictors [must use WALD test, not LRT]  
+**Answer:** The wald test gives a p-value less than 0.05, which justifies the significance of adding a block of individual predictors.  
+
+b. Report change in variance components for all levels  
+**Answer:** The change in $\sigma_\eta^2$ is `r as.data.frame(VarCorr(fit4))$vcov[1]`-`r as.data.frame(VarCorr(fit3))$vcov[1]` = `r as.data.frame(VarCorr(fit4))$vcov[1] - as.data.frame(VarCorr(fit3))$vcov[1]`, increases; the change in $\sigma_\zeta^2$ is `r as.data.frame(VarCorr(fit4))$vcov[2]`-`r as.data.frame(VarCorr(fit3))$vcov[2]` = `r as.data.frame(VarCorr(fit4))$vcov[2] - as.data.frame(VarCorr(fit3))$vcov[2]`, decreases; and change in $\sigma^2_\epsilon$ is `r as.data.frame(VarCorr(fit4))$vcov[3]`-`r as.data.frame(VarCorr(fit3))$vcov[3]` = `r as.data.frame(VarCorr(fit4))$vcov[3] - as.data.frame(VarCorr(fit3))$vcov[3]`, decreases.  
+
+c. Give a potential reason as to why the school level variance component drops from prior model  
+The aggregate effect of individual predictors account for school-level variance, as a result the school-level  variance component drops.  
+
 d. WRITE OUT THIS MODEL using your chosen notation (include assumptions).  
+
 $MATH1ST_{ijk} = {b_0} + b_1SES_{ijk} + b_2MINORITY_{ijk} + b_3SEX_{ijk} + b_4YEARSTEA_{jk} + b_5MATHKNOW_{jk} + b_6MATHPREP_{jk}+ b_7HOUSEPOV_{k} + \zeta _{0k} + \eta _{0jk}+ {\varepsilon _{ijk}}$, with
 ${\zeta_{0k}}\sim N(0,\sigma_{\zeta_0}^2)$,
 $\eta _{0jk} \sim N(0,\sigma_{\eta_0}^2)$ and 
 ${\varepsilon_{ijk}}\sim N(0,\sigma_\varepsilon^2)$, 
 independently of one another, *j*
   represents classrooms and *k*
-  represents *schools*.
-5.a. Try to add a random slope for each teacher level predictor (varying at the school level; one by one separately- not all together) 
+  represents *schools*.  
+  
+5.a. Try to add a random slope for each teacher level predictor (varying at the school level; one by one separately- not all together)  
 b. Report the model fit or lack of fit 
 ```{r}
 fit5.1 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
@@ -172,7 +178,7 @@ It seems that in all these models, the random slope and random intercepts are hi
     **Answer: **The coefficient on classroom-level variable and the classroom-level variable accounts for the same variation in the population, as a result, adding a classroom-level random slope on classroom-level variable would be redundant.  
   **Alternative: **Classroom-level variables only vary at school-level, so the classroom-level random slope would capture limited variation.
   
-## A2
+## A2 Jeremy Lu
 
 7. Question:
   a. For UMM, write down: V_S, V_C, V_E for the three variance components (simply the estimates)
@@ -180,7 +186,7 @@ It seems that in all these models, the random slope and random intercepts are hi
   b. For the most complicated (all fixed effects) random INTERCEPTS ONLY model, what are: V_C, V_S, V_E?
   **Answer:** We have in this model that V_S = 169.45, V_C = 93.89, V_E = 1064.96
   c. By what fraction did these each decrease with the new predictors in the model?
-  **Answer:** The fraction decrease for V_S, and V_E are `round((280.68-169.45)/280.68, 2)`, and `round((1146.8-1064.96)/1146.8, 2)`, respectively. But for V_C it actually increased `round((93.89-85.46)/85.46, 2)` fraction-wise.
+  **Answer:** The fraction decrease for V_S, and V_E are `round((280.68-169.45)/280.68, 2)`, and `r round((1146.8-1064.96)/1146.8, 2)`, respectively. But for V_C it actually increased `r round((93.89-85.46)/85.46, 2)` fraction-wise.
   
 8. a. 
 ```{r}
@@ -205,19 +211,19 @@ b. Retry part (a), allowing the slopes to be correlated with the random intercep
 
 ```{r}
 fit8.b.1 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                housepov + (1 | schoolid/classid) + (ses || schoolid), dat, subset = in_sample)
+                housepov + (1 | schoolid/classid) + (ses | schoolid), dat, subset = in_sample)
 summary(fit8.b.1)
 ```
 
 ```{r}
 fit8.b.2 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                housepov + (1 | schoolid/classid) + (ses || schoolid), dat, subset = in_sample)
+                housepov + (1 | schoolid/classid) + (sex | schoolid), dat, subset = in_sample)
 summary(fit8.b.2)
 ```
 
 ```{r}
 fit8.b.3 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                housepov + (1 | schoolid/classid) + (ses || schoolid), dat, subset = in_sample)
+                housepov + (1 | schoolid/classid) + (minority | schoolid), dat, subset = in_sample)
 summary(fit8.b.3)
 ```
 
@@ -227,7 +233,7 @@ c. Report anything unusual about the variance components (changes that are unexp
 9. a. Take the two predictors that had significant (at .05 level) random slopes, in the forms in which they worked (indep. or correlated) and add both to the model, and test for need of one conditional on already including the other.
 ```{r}
 fit9 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                housepov + (1 | schoolid/classid) + (0 + sex + ses || schoolid), dat, subset = in_sample)
+                housepov + (1 | schoolid/classid) + (0 + sex + ses | schoolid), dat, subset = in_sample)
 
 anova(fit8.a.1, fit9) #P = 0.4282
 anova(fit8.a.2, fit9) #P = 0.0333
