@@ -37,7 +37,7 @@ summary(fit1)
 ```
 
 a. Report the ICC for schools and the ICC for classrooms 
-**Answer:** The ICC for schools is `r as.data.frame(VarCorr(fit1))$vcov[2]/as.data.frame(VarCorr(fit1))$vcov[3]` and the ICC for classrooms is `r as.data.frame(VarCorr(fit1))$vcov[1]/as.data.frame(VarCorr(fit1))$vcov[3]`.  
+**Answer:** The ICC for schools is `r as.data.frame(VarCorr(fit1))$vcov[2]/(as.data.frame(VarCorr(fit1))$vcov[2]+as.data.frame(VarCorr(fit1))$vcov[3])` and the ICC for classrooms is `r as.data.frame(VarCorr(fit1))$vcov[1]/(as.data.frame(VarCorr(fit1))$vcov[1]+as.data.frame(VarCorr(fit1))$vcov[3])`.  
 b. **WRITE OUT THIS MODEL** using your preferred notation, but use the same choice of notation for the remainder of your project 
 i. Be mindful and explicit about any assumptions made. 
 $MATH1ST_{ijk} = {b_0} + \zeta _{0k} + \eta _{0jk}+ {\varepsilon _{ijk}}$, with
@@ -49,7 +49,6 @@ independently of one another, *j*
   represents *schools*.
 2. ADD ALL School level predictors 
 ```{r q2}
-fit1 <- lmer( math1st ~ (1 | schoolid/classid), dat)
 fit2 <- lmer( math1st ~ housepov + (1 | schoolid/classid), dat)
 summary(fit2)
 anova(fit1,fit2)
@@ -77,6 +76,9 @@ a. Report if adding the predictors as a block is justified [must use WALD test, 
 b. Report change in $\sigma^2_\eta$ and change in $\sigma^2_\epsilon$. 
 The change in $\sigma_\eta^2$ is `r as.data.frame(VarCorr(fit3))$vcov[1]`-`r as.data.frame(VarCorr(fit1))$vcov[1]` = `r as.data.frame(VarCorr(fit3))$vcov[1] - as.data.frame(VarCorr(fit1))$vcov[1]` and change in $\sigma^2_\epsilon$ is `r as.data.frame(VarCorr(fit3))$vcov[3]`-`r as.data.frame(VarCorr(fit1))$vcov[3]` = `r as.data.frame(VarCorr(fit3))$vcov[3] - as.data.frame(VarCorr(fit1))$vcov[3]`.
 c. Give a potential reason as to why $\sigma^2_\epsilon$ is reduced, but not $\sigma^2_\eta$? 
+
+A potential might be, the same teacher (same classroom)might have different effect on each student, therefore when we introduce a classroom-level fix effect, the model does not reduces classroom-level random effect, instead, reduces individual-level effect.
+
   4. ADD (nearly) ALL student level predictors (but not `mathgain` or `mathkind`, as these are outcomes in this context). 
 ```{r}
 fit4 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
@@ -103,41 +105,73 @@ independently of one another, *j*
 b. Report the model fit or lack of fit 
 ```{r}
 fit5.1 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                  housepov + (1 | schoolid/classid) + (0 + yearstea || schoolid), 
+                  housepov + (1 | schoolid/classid) + (0 + yearstea | schoolid), 
                 dat, subset = in_sample)
 summary(fit5.1)
 ```
+
 ```{r}
 fit5.2 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                  housepov + (1 | schoolid/classid) + (0 + yearstea + mathknow || schoolid),
+                  housepov + (1 | schoolid/classid) + (0 + mathknow | schoolid),
                 dat, subset = in_sample)
 summary(fit5.2)
 ```
+
 ```{r}
 fit5.3 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                  housepov + (1 | schoolid/classid) + (0 + yearstea + mathknow + mathprep || schoolid), 
+                  housepov + (1 | schoolid/classid) + (0 + mathprep | schoolid), 
                 dat, subset = in_sample)
 summary(fit5.3)
 ```
+**Answer 5b:** The model with random slope on `mathknow` and the model with random slope on `mathprep` have convergent problem.
+
 c. Retry the above, allowing the slopes to be correlated with the random intercepts (still one by one) 
+
 ```{r}
 fit5.c.1 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                    housepov + (1 | schoolid/classid) + (yearstea || schoolid), 
-                  dat, subset = in_sample)
-fit5.c.2 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                    housepov + (1 | schoolid/classid) + (yearstea + mathknow|| schoolid), 
-                  dat, subset = in_sample)
-fit5.c.3 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                    housepov + (1 | schoolid/classid) + (yearstea + mathknow + mathprep || schoolid), 
+                    housepov + (yearstea | schoolid) + (1 | classid), 
                   dat, subset = in_sample)
 ```
 
+```{r}
+fit5.c.2 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
+                    housepov + (mathknow| schoolid) + (1 | classid), 
+                  dat, subset = in_sample)
+fit5.c.2 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
+                    housepov + (mathknow| classid) + (1 | schoolid/classid), 
+                  dat, subset = in_sample)
+summary(fit5.c.2)
+```
+
+```{r}
+fit5.c.3 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
+                    housepov + (mathprep | schoolid) + (1|classid), 
+                  dat, subset = in_sample)
+summary(fit5.c.3)
+```
+
 d. Report anything unusual about the variance components (changes that are in a direction you didn’t expect) and any potential explanation for why those changes occurred (hint: what did you add to the model?).  
+```{r}
+VarCorr(fit5.1)
+VarCorr(fit5.c.1)
+```
+
+```{r}
+VarCorr(fit5.2)
+VarCorr(fit5.c.2)
+```
+
+```{r}
+VarCorr(fit5.3)
+VarCorr(fit5.c.3)
+```
+It seems that in all these models, the random slope and random intercepts are highly correlated. After introducing correlation between random slope and random intercept, we found that school-level random intercept increase a lot in the model with `mathprep` or `yearstea`, while it decrease in the model with `mathknow`.
 
 6. Question: 
   a. Why is it a bad idea to include a classroom-level variable with random slopes at the classroom level?
-
-
+    **Answer: **The coefficient on classroom-level variable and the classroom-level variable accounts for the same variation in the population, as a result, adding a classroom-level random slope on classroom-level variable would be redundant.  
+  **Alternative: **Classroom-level variables only vary at school-level, so the classroom-level random slope would capture limited variation.
+  
 ## A2
 
 7. Question:
