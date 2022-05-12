@@ -211,19 +211,19 @@ b. Retry part (a), allowing the slopes to be correlated with the random intercep
 
 ```{r}
 fit8.b.1 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                housepov + (1 | schoolid/classid) + (ses | schoolid), dat, subset = in_sample)
+                housepov + (1 | classid) + (ses | schoolid), dat, subset = in_sample)
 summary(fit8.b.1)
 ```
 
 ```{r}
 fit8.b.2 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                housepov + (1 | schoolid/classid) + (sex | schoolid), dat, subset = in_sample)
+                housepov + (1 | classid) + (sex | schoolid), dat, subset = in_sample)
 summary(fit8.b.2)
 ```
 
 ```{r}
 fit8.b.3 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
-                housepov + (1 | schoolid/classid) + (minority | schoolid), dat, subset = in_sample)
+                housepov + (1 | classid) + (minority | schoolid), dat, subset = in_sample)
 summary(fit8.b.3)
 ```
 
@@ -235,11 +235,11 @@ c. Report anything unusual about the variance components (changes that are unexp
 fit9 <- lmer( math1st ~ ses + minority + sex + yearstea + mathknow + mathprep + 
                 housepov + (1 | schoolid/classid) + (0 + sex + ses | schoolid), dat, subset = in_sample)
 
-anova(fit8.a.1, fit9) #P = 0.4282
-anova(fit8.a.2, fit9) #P = 0.0333
+anova(fit8.a.1, fit9) #P = 0.1581
+anova(fit8.a.2, fit9) #P = 0.02248
 ```
   b. Is the more complex model (with both random slopes in it) justified?
-  **Answer:** It is only justified compared to the model that has just sex as a random slope. Based on the LRT having ses with a random slope as well is justified based on the 0.03 p-value.
+  **Answer:** It is only justified compared to the model that has just sex as a random slope. Based on the LRT having ses with a random slope as well is justified based on the 0.02 p-value.
   c. WRITE OUT THIS MODEL in your preferred notation (include assumptions)
 $MATH1ST_{ijk} = {b_0} + (b_1+\zeta_{1k})SES_{ijk} + b_2MINORITY_{ijk} + (b_3+\zeta_{3k})SEX_{ijk} + b_4YEARSTEA_{jk} + b_5MATHKNOW_{jk} + b_6MATHPREP_{jk}+ b_7HOUSEPOV_{k} + \zeta _{0k} + \eta _{0jk}+ {\varepsilon _{ijk}}$, with
 ${\zeta_{0k}}\sim N(0,\sigma_{\zeta_0}^2)$, ${\zeta_{1k}}\sim N(0,\sigma_{\zeta_1}^2)$, ${\zeta_{3k}}\sim N(0,\sigma_{\zeta_3}^2)$
