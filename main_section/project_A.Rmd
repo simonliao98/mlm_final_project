@@ -173,7 +173,7 @@ d. Report anything unusual about the variance components (changes that are in a 
   b. For the most complicated (all fixed effects) random INTERCEPTS ONLY model, what are: V_C, V_S, V_E?
   **Answer:** We have in this model that V_S = 169.45, V_C = 93.89, V_E = 1064.96
   c. By what fraction did these each decrease with the new predictors in the model?
-  **Answer:** The fraction decrease for V_S, and V_E are `round((280.68-169.45)/280.68, 2)`, and `r round((1146.8-1064.96)/1146.8, 2)`, respectively. But for V_C it actually increased `r round((93.89-85.46)/85.46, 2)` fraction-wise.
+  **Answer:** The fraction decrease for V_S, and V_E are `r round((280.68-169.45)/280.68, 2)`, and `r round((1146.8-1064.96)/1146.8, 2)`, respectively. But for V_C it actually increased `r round((93.89-85.46)/85.46, 2)` fraction-wise.
   
 8. a. 
 ```{r}
