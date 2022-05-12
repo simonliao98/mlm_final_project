@@ -235,7 +235,7 @@ anova(fit8.a.1, fit9) #P = 0.0022
 anova(fit8.a.2, fit9) #P = 0.0003129
 ```
   b. Is the more complex model (with both random slopes in it) justified?
-  **Answer:** It is only justified compared to the model that has just sex as a random slope. Based on the LRT having ses with a random slope as well is justified based on the 0.03 p-value.
+  **Answer:** It is only justified compared to the model that has just sex as a random slope. Based on the LRT having ses with a random slope as well is justified based on the 0.02 p-value.
   c. WRITE OUT THIS MODEL in your preferred notation (include assumptions)
 $MATH1ST_{ijk} = {b_0} + (b_1+\zeta_{1k})SES_{ijk} +( b_2+\zeta_{2k})MINORITY_{ijk} + b_3SEX_{ijk} + b_4YEARSTEA_{jk} + b_5MATHKNOW_{jk} + b_6MATHPREP_{jk}+ b_7HOUSEPOV_{k} + \zeta _{0k} + \eta _{0jk}+ {\varepsilon _{ijk}}$, with
 ${\zeta_{0k}}\sim N(0,\sigma_{\zeta_0}^2)$, ${\zeta_{1k}}\sim N(0,\sigma_{\zeta_1}^2)$, ${\zeta_{3k}}\sim N(0,\sigma_{\zeta_3}^2)$

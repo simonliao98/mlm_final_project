@@ -19,7 +19,7 @@ require(tidyverse)
 ## Question 0: read data and process missingness
 
 ```{r question 0}
-dat <- read.dta("classroom.dta")
+dat <- read_csv("classroom.csv")
 
 # construct new outcome math1st
 dat <- 
@@ -35,7 +35,7 @@ dat <-
 ## Question 1
 ```{r question 1}
 # fit a model
-fit1 <- lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (1|schoolid/classid), data = dat)
+fit1 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (1|schoolid/classid), data = dat)
 summary(fit1)
 
 # plot residuals to test normality assumption
@@ -49,6 +49,7 @@ QQ plot shows that points are around the line, and thus we believe the normality
 ## Question 2
 
 ```{r question 2}
+# Generate the two sets of BLUPs (for random effects zeta0 and eta0)
 blups_fit1 <- ranef(fit1)
 
 par(mfrow=c(1,2))  
@@ -69,11 +70,71 @@ QQ plot shows that both sets of BLUPs of zeta0 and eta0 are around the line, and
 ## Question 3
 
 ```{r question 3}
-# fit2 <- lmer(mathgain ~ mathkind + ses + minority + yearstea + (yearstea | schoolid), data = dat)
-# math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (minority|schoolid)
-# 
-# print(summary(fit3))
+# a
+# add a random slope for minority, correlated with the random intercept, at the school level
+fit2 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (minority|schoolid) + (1 | classid), data = dat)
+print(summary(fit2))
 
+# b
+# residual
+blups_fit2 <- ranef(fit2)
+# BULPs
+zeta0 <- blups_fit2$schoolid$`(Intercept)`
+zeta1 <- blups_fit2$schoolid$minority
+eta0 <- blups_fit2$classid$`(Intercept)`
+
+# c
+# check normality
+par(mfrow=c(2,2))  
+# examine normality for eta0 (class-level)
+qqnorm(eta0, pch = 1, frame = FALSE, main = "Normal Q-Q plot for eta0")
+qqline(eta0, col = "steelblue", lwd = 2)
+  
+# examine normality for zeta0 (school-level)
+zeta0_fit1 <- blups_fit1$schoolid$`(Intercept)`
+qqnorm(zeta0, pch = 1, frame = FALSE, main = "Normal Q-Q plot for zeta0")
+qqline(zeta0, col = "red", lwd = 2)
+
+# examine normality for zeta1 (random slop)
+qqnorm(zeta1, pch = 1, frame = FALSE, main = "Normal Q-Q plot for zeta1")
+qqline(zeta1, col = "chartreuse3", lwd = 2)
+par(mfrow=c(1,1)) 
 ```
+QQ plot shows that BLUPs of zeta0, eta0, and zeta1 are around the line, and thus we believe the normality assumption holds.
 
+```{r}
+# d
+plot(zeta1, zeta0)
+```
+Overall, zeta0 and zeta1 are negative correlated. However, some odd points are positive correlated.
+
+```{r}
+# e
+# these schools are 
+unique(dat$schoolid)[3-abs(blups_fit2$schoolid$minority)>0]
+odd_point <- 
+  dat %>% 
+  filter(schoolid %in% unique(dat$schoolid)[3-abs(blups_fit2$schoolid$minority)>0])
+```
+Students in these schools are almost minority.
+
+## Question 4
+### a
+$V_S = 93.89$, $V_C = 169.45$, and $V_E = 1064.96$.
+
+```{r Question 4}
+# fit a model
+fit3 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (ses|schoolid) + (1 | classid), data = dat)
+summary(fit3)
+```
+### c
+$V_C=86.57$, $V_{S(ses=0)}=171.18$, and $V_E=73.36$.
+
+### d
+$V_{S(ses=-0.50)}=171.18+2*(-0.5)*13.083*8.565*0.19+(-0.5)^2*73.36=$ `r round(171.18+2*(-0.5)*13.083*8.565*0.19+(-0.5)^2*73.36, 2)`
+
+$V_{S(ses=0.50)}=171.18+2*(0.5)*13.083*8.565*0.19+(0.5)^2*73.36=$ `r round(171.18+2*(0.5)*13.083*8.565*0.19+(0.5)^2*73.36, 2)`
+
+### e
+There is heteroscedasticity at school level because $V_{S(ses=0.50)}$ and $V_{S(ses=-0.50)}$ are not approximate.
 
