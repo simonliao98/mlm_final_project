@@ -106,12 +106,18 @@ QQ plot shows that BLUPs of zeta0, eta0, and zeta1 are around the line, and thus
 # d
 plot(zeta1, zeta0)
 ```
-Overall, zeta0 and zeta1 are negative correlated. However, some odds points are positive correlated.
+Overall, zeta0 and zeta1 are negative correlated. However, some odd points are positive correlated.
 
 ```{r}
 # e
-blups_fit2$schoolid$minority[3-abs(blups_fit2$schoolid$minority)>0]
+# these schools are 
+unique(dat$schoolid)[3-abs(blups_fit2$schoolid$minority)>0]
+odd_point <- 
+  dat %>% 
+  filter(schoolid %in% unique(dat$schoolid)[3-abs(blups_fit2$schoolid$minority)>0])
 ```
+Students in these schools are almost minority.
+
 ## Question 4
 ### a
 $V_S = 93.89$, $V_C = 169.45$, and $V_E = 1064.96$.
@@ -128,6 +134,7 @@ $V_C=86.57$, $V_{S(ses=0)}=171.18$, and $V_E=73.36$.
 $V_{S(ses=-0.50)}=171.18+2*(-0.5)*13.083*8.565*0.19+(-0.5)^2*73.36=$ `r round(171.18+2*(-0.5)*13.083*8.565*0.19+(-0.5)^2*73.36, 2)`
 
 $V_{S(ses=0.50)}=171.18+2*(0.5)*13.083*8.565*0.19+(0.5)^2*73.36=$ `r round(171.18+2*(0.5)*13.083*8.565*0.19+(0.5)^2*73.36, 2)`
+
 ### e
-There is heteroscedasticity at school level because $V_{S(ses=0.50)}$ and $V_{S(ses=-0.50)}$ are not approximate
+There is heteroscedasticity at school level because $V_{S(ses=0.50)}$ and $V_{S(ses=-0.50)}$ are not approximate.
 
