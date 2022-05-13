@@ -557,8 +557,7 @@ data <- ranef(fit3)
 # plot the correlation
 plot(data$schoolid$`(Intercept)`, data$schoolid$year)
 ```
-Based on the above scatter plot, I would say zeta0 and zeta1 are independent because there does exist a patter which
-can explain the relationship between year(x) and intercept(y)
+Based on the above scatter plot, I would say zeta0 and zeta1 are independent because there does not exist a pattern which can explain the relationship between slope and intercept
 
 
 ### b. Compute V_S(year=0) and V_S(year=1). Since there are only two years, this is a form of heteroscedasticity in the random effects.
