@@ -138,7 +138,7 @@ sq <- (3-abs(blups_fit2$schoolid$minority)>0)&(zeta1<=0&zeta0<=0)
 unique(dat$schoolid)[fq|sq]
 odd_point <- 
   dat %>% 
-  filter(schoolid %in% unique(dat$schoolid)[3-abs(blups_fit2$schoolid$minority)>0])
+  filter(schoolid %in% unique(dat$schoolid)[fq|sq])
 ```
 Almost all students in these school are minority.
 
