@@ -116,7 +116,7 @@ odd_point <-
   dat %>% 
   filter(schoolid %in% unique(dat$schoolid)[3-abs(blups_fit2$schoolid$minority)>0])
 ```
-Students in these schools are almost minority.
+Almost all students in these school are minority.
 
 ## Question 4
 ### a
@@ -124,7 +124,8 @@ $V_S = 93.89$, $V_C = 169.45$, and $V_E = 1064.96$.
 
 ```{r Question 4}
 # fit a model
-fit3 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (ses|schoolid) + (1 | classid), data = dat)
+fit3 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (ses|schoolid) + (1 | classid), 
+                       data = dat)
 summary(fit3)
 ```
 ### c
