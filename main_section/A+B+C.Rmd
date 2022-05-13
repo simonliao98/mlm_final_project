@@ -5,7 +5,7 @@ date: "5/7/2022"
 output: 
   pdf_document:
     toc: true
-    toc_depth: 2
+    toc_depth: 1
 ---
   
 ```{r setup, include=FALSE}
@@ -192,6 +192,8 @@ d. Report anything unusual about the variance components (changes that are in a 
   a. Why is it a bad idea to include a classroom-level variable with random slopes at the classroom level?  
 **Answer: **Classroom-level variables does not vary within classroom, if there is no variation on variable, the slope could not be measured, so adding a random slope on classroom variable at classroom level makes no sense.
 
+\newpage
+
 # A2, Jeremy Lu
 
 7. Question:
@@ -314,6 +316,8 @@ V_S(minority=0.75) = $\sigma_{\zeta_{0k}^2}+2 \times0.75 \times\rho_{\zeta_{0k},
 `r data.frame(VarCorr(fit8.b.3))[2,4]+0.75^2 * data.frame(VarCorr(fit8.b.3))[3,4] + 1.5*data.frame(VarCorr(fit8.b.3))[4,5]*data.frame(VarCorr(fit8.b.3))[3,5]*data.frame(VarCorr(fit8.b.3))[2,5]`  
   c. Is the variance between schools monotonically *increasing* in the value of minority?  
 **Answer: ** No, it seems to be decreasing from minority 0 to 0.75 given the variance calculated.  
+
+\newpage
 
 # Project B, Xinming Dai
 
@@ -464,6 +468,7 @@ $V_{S(ses=0.50)}=171.18+2*(0.5)*13.083*8.565*0.19+(0.5)^2*73.36=$ `r round(171.1
 ### e
 There is heteroscedasticity at school level (3) because $V_{S(ses=0.50)}$ and $V_{S(ses=-0.50)}$ are not approximate and $V_S$ are depend on ses.
 
+\newpage
 
 # Project C – Longitudinal Data, Yu Wang
 
