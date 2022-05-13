@@ -1,6 +1,6 @@
 ---
-title: "Project A1+A2 - Model Selection and Notation"
-author: "Chongjun Liao, Jeremy Lu"
+title: "Project A1+A2+B+C"
+author: "Chongjun Liao, Jeremy Lu, Yu Wang, Xinming Dai"
 date: "5/7/2022"
 output: 
   pdf_document:
@@ -16,7 +16,7 @@ library(dplyr)
 library(aod)
 ```
 
-## A1 Chongjun Liao
+# A1, Chongjun Liao
 
 0. We will use the classroom.csv data for this project. 
 a. math1st will be the outcome of interest for this first part  
@@ -192,7 +192,7 @@ d. Report anything unusual about the variance components (changes that are in a 
   a. Why is it a bad idea to include a classroom-level variable with random slopes at the classroom level?  
 **Answer: **Classroom-level variables does not vary within classroom, if there is no variation on variable, the slope could not be measured, so adding a random slope on classroom variable at classroom level makes no sense.
 
-## A2 Jeremy Lu
+# A2, Jeremy Lu
 
 7. Question:
   a. For UMM, write down: V_S, V_C, V_E for the three variance components (simply the estimates)  
@@ -313,4 +313,286 @@ V_S(minority=0.50) =$\sigma_{\zeta_{0k}^2}+2 \times0.5 \times\rho_{\zeta_{0k},\z
 V_S(minority=0.75) = $\sigma_{\zeta_{0k}^2}+2 \times0.75 \times\rho_{\zeta_{0k},\zeta_{2k}}+0.75^2\sigma_{\zeta_{2k}^2}$=
 `r data.frame(VarCorr(fit8.b.3))[2,4]+0.75^2 * data.frame(VarCorr(fit8.b.3))[3,4] + 1.5*data.frame(VarCorr(fit8.b.3))[4,5]*data.frame(VarCorr(fit8.b.3))[3,5]*data.frame(VarCorr(fit8.b.3))[2,5]`  
   c. Is the variance between schools monotonically *increasing* in the value of minority?  
-**Answer: ** No, it seems to be decreasing from minority 0 to 0.75 given the variance calculated.
+**Answer: ** No, it seems to be decreasing from minority 0 to 0.75 given the variance calculated.  
+
+# Project B, Xinming Dai
+
+## Question 0: read data and process missingness
+
+```{r question 0}
+dat <- read.csv("classroom.csv")
+
+# construct new outcome math1st
+dat <- 
+  dat %>% 
+  mutate(math1st = mathkind + mathgain)
+
+# remove missing data
+dat <- 
+  dat %>% 
+  filter(complete.cases(dat))
+```
+
+## Question 1
+```{r question 1}
+# fit a model
+fit1 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (1|schoolid/classid), data = dat)
+summary(fit1)
+
+# plot residuals to test normality assumption
+res1 <- residuals(fit1)
+# density plot
+plot(density(res1))
+# QQ plot
+qqnorm(res1, pch = 1, frame = FALSE)
+qqline(res1, col = "steelblue", lwd = 2)
+```
+
+QQ plot shows that points are around the line, and thus we believe the normality assumption holds.
+
+## Question 2
+
+```{r question 2}
+# Generate the two sets of BLUPs (for random effects zeta0 and eta0)
+blups_fit1 <- ranef(fit1)
+
+par(mfrow=c(2,2))  
+# examine normality for eta0 (class-level)
+eta0_fit1 <- blups_fit1$`classid:schoolid`$`(Intercept)`
+# density plot
+plot(density(eta0_fit1))
+# QQ plot
+qqnorm(eta0_fit1, pch = 1, frame = FALSE, main = "Normal Q-Q plot for eta0")
+qqline(eta0_fit1, col = "steelblue", lwd = 2)
+  
+# examine normality for zeta0 (school-level)
+zeta0_fit1 <- blups_fit1$schoolid$`(Intercept)`
+# density plot
+plot(density(zeta0_fit1))
+# QQ plot
+qqnorm(zeta0_fit1, pch = 1, frame = FALSE, main = "Normal Q-Q plot for zeta0")
+qqline(zeta0_fit1, col = "red", lwd = 2)
+par(mfrow=c(1,1))  
+```
+
+QQ plot shows that both sets of BLUPs of zeta0 and eta0 are around the line, and thus we believe the normality assumption holds.
+
+## Question 3
+
+```{r question 3}
+# a
+# add a random slope for minority, correlated with the random intercept, at the school level
+fit2 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (minority|schoolid) + (1 | classid), data = dat)
+print(summary(fit2))
+
+# b
+# residual
+blups_fit2 <- ranef(fit2)
+# BULPs
+zeta0 <- blups_fit2$schoolid$`(Intercept)`
+zeta1 <- blups_fit2$schoolid$minority
+eta0 <- blups_fit2$classid$`(Intercept)`
+
+# c
+# check normality
+par(mfrow=c(3,2))  
+# density plot
+plot(density(eta0))
+# QQ plot
+# examine normality for eta0 (class-level)
+qqnorm(eta0, pch = 1, frame = FALSE, main = "Normal Q-Q plot for eta0")
+qqline(eta0, col = "steelblue", lwd = 2)
+  
+# examine normality for zeta0 (school-level)
+# density plot
+plot(density(zeta0))
+# QQ plot
+qqnorm(zeta0, pch = 1, frame = FALSE, main = "Normal Q-Q plot for zeta0")
+qqline(zeta0, col = "red", lwd = 2)
+
+# examine normality for zeta1 (random slop)
+# density plot
+plot(density(zeta1))
+# QQ plot
+qqnorm(zeta1, pch = 1, frame = FALSE, main = "Normal Q-Q plot for zeta1")
+qqline(zeta1, col = "chartreuse3", lwd = 2)
+par(mfrow=c(1,1)) 
+```
+QQ plot shows that BLUPs of eta0 are around the line, and thus we believe the normality assumption holds.
+However, BLUPs of zeta0, and zeta1 deviate from the line too much, and therefore we don't think the normality assumption holds.
+
+```{r}
+# d
+plot(zeta1, zeta0)
+```
+
+Overall, zeta0 and zeta1 are negative correlated. However, some odd points are positive correlated.
+
+```{r}
+# e
+# points from first quadrant
+fq <- (3-abs(blups_fit2$schoolid$minority)>0)&(zeta1>=0&zeta0>=0)
+# points from third quadrant
+sq <- (3-abs(blups_fit2$schoolid$minority)>0)&(zeta1<=0&zeta0<=0)
+
+# these schools are 
+unique(dat$schoolid)[fq|sq]
+odd_point <- 
+  dat %>% 
+  filter(schoolid %in% unique(dat$schoolid)[fq|sq])
+```
+Almost all students in these school are minority.
+
+## Question 4
+### a
+$V_S = 169.45$, $V_C = 93.89$, and $V_E = 1064.96$.
+
+```{r Question 4}
+# fit a model
+fit3 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (ses|schoolid) + (1 | classid), 
+                       data = dat)
+summary(fit3)
+```
+### c
+$V_C=86.57$, $V_{S(ses=0)}=171.18$, and $V_E=1035.90$.
+
+### d
+$V_{S(ses=-0.50)}=171.18+2*(-0.5)*13.083*8.565*0.19+(-0.5)^2*73.36=$ `r round(171.18+2*(-0.5)*13.083*8.565*0.19+(-0.5)^2*73.36, 2)`
+
+$V_{S(ses=0.50)}=171.18+2*(0.5)*13.083*8.565*0.19+(0.5)^2*73.36=$ `r round(171.18+2*(0.5)*13.083*8.565*0.19+(0.5)^2*73.36, 2)`
+
+### e
+There is heteroscedasticity at school level (3) because $V_{S(ses=0.50)}$ and $V_{S(ses=-0.50)}$ are not approximate and $V_S$ are depend on ses.
+
+
+# Project C – Longitudinal Data, Yu Wang
+
+## 1. Make a person-period file with math score (Kindergarten and First grade). That is, math0 <- mathkind; math1 <- mathkind+mathgain (you have to make this work in the dataframe). Using reshape in R, you have to be careful to specify the name of the math variable (math0 and math1) as varying.
+```{r}
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(lattice)
+require(foreign)
+dat<- read.csv('classroom.csv')
+dat$math0 <- dat$mathkind
+dat$math1 <- dat$mathkind + dat$mathgain
+class_pp <- reshape(dat, varying = c("math0", "math1"), v.names = "math", timevar = "year",
+times = c(0, 1), direction = "long")
+
+```
+
+
+
+
+## 2.We ignore classrooms in this analysis, but keep it in the notation
+### 2a. Fit a model with math as outcome, and fixed effect for time trend (year), and random intercepts for schools.
+ANS:
+```{r}
+# a
+fit1 <- lmer(math ~ year + (1 | schoolid), data = class_pp)
+summary(fit1)
+```
+
+### 2b. Write down the model (include assumptions).
+ANS :
+$MATH_{tijk} = {b_0} + {\zeta_{0k}} + {b_1}TIME_{tijk} + {\varepsilon_{tijk}}$
+and assume ${\zeta_{0k}} \sim N(0,\sigma_{{\zeta_0}}^2)$, and ${\varepsilon_{tijk}} \sim N(0,\sigma _\varepsilon ^2)$, independently.
+
+### 2c. Add random intercepts for child
+```{r}
+fit2 <- lmer(math ~ year + (1 |schoolid/childid), data = class_pp)
+summary(fit2)
+```
+
+### 2d. Write down the model (include assumptions).
+ANS :
+$MATH_{tijk} = {b_0} + {\delta_{0ijk}} + {\zeta_{0k}} + {b_1}TIME_{tijk} + {\varepsilon_{tijk}}$
+and assume ${\delta_{0ijk}} \sim N(0,\sigma_{{\delta_0}}^2)$, ${\zeta_{0k}} \sim N(0,\sigma_{{\zeta_0}}^2)$, and ${\varepsilon_{tijk}} \sim N(0,\sigma _\varepsilon ^2)$, independently.
+
+
+
+
+## 3. Report original and new variance estimates for $\sigma_{{\zeta_0}}^2$ (between schools) and $\sigma _\varepsilon ^2$(within schools)
+ANS: The old between school variance is 348.7 where the old within school variance is 1268.4
+     The new between school variance is 307.5 where the new within school variance is 599.1
+
+
+### a Compute a pseudo R2 relating the between school variation and ignoring between students in the same school. In other words, what fraction of the between-school variance in the first model is ‘explained’ by the addition of a student random effect?
+ANS: R^2 = (348.7-307.5)/348.7 = 0.11
+
+
+### b. Does the total variation stay about the same (adding between children within schools variance as well, to the second model results)?
+ANS: The total variance in the fit1 is 348.7 + 1268.4 = 1617.1
+     The total variance in the fit2 is 702 + 307.5 + 599.1 = 1608.6
+     Hence, the total variation seems stay about the same although their values are not exactly same.
+     
+
+
+
+## 4. Add a random slope (zeta1) for time trend (year) within schools (uncorrelated with random intercept (zeta0))
+ANS:
+```{r}
+fit3 <- lmer(math ~ year + (year || schoolid) + (1 | schoolid:childid),data = class_pp)
+summary(fit3)
+```
+
+
+### a Generate the BLUPs for the random effects and examine whether the independence between zeta0 and zeta1 is REFLECTED in a scatterplot of these two sets of effects.
+ANS:
+```{r}
+# obtain the random effects
+data <- ranef(fit3)
+
+# plot the correlation
+plot(data$schoolid$`(Intercept)`, data$schoolid$year)
+```
+Based on the above scatter plot, I would say zeta0 and zeta1 are independent because there does exist a patter which
+can explain the relationship between year(x) and intercept(y)
+
+
+### b. Compute V_S(year=0) and V_S(year=1). Since there are only two years, this is a form of heteroscedasticity in the random effects.
+#### i. In which year is there more between school variation, net of all else (year=0 or year=1)?
+ANS: V_S(year=0) = $\sigma_{{\zeta_0}}^2$ + 0 * $\sigma_{{\zeta_0}}^2$ = 324.79
+     V_S(year=1) = $\sigma_{{\zeta_0}}^2$ + 1 * $\sigma_{{\zeta_0}}^2$ = 324.79 + 88.67 = 413.46
+     Based on the hand calculation, I would say (year=1) has more between school variation 
+
+
+
+
+## 5.If you ran the model separately BY YEAR, and removed the year trend from the model, would you get the same estimates for the variance between schools? TRY IT
+ANS
+```{r}
+dat_temp = class_pp %>% filter(year==0)
+fit_year0 = lmer(math ~ (1 | schoolid),data = dat_temp)
+summary(fit_year0)
+
+dat_temp2 = class_pp %>% filter(year==1)
+fit_year1 = lmer(math ~ (1| schoolid), data = dat_temp2)
+summary(fit_year1)
+```
+Based on the above summary table, we would say year1(364.3) has more between school variation than year0(306.8).
+
+
+
+
+## 6. Rerun the last nested longitudinal model, allowing correlation between intercept and slope.
+```{r}
+fit4 <- lmer(math ~ year + (year | schoolid) + (1| schoolid:childid), data = class_pp)
+summary(fit4)
+```
+### a. Is the correlation signif.?
+```{r}
+anova(fit3, fit4, refit = F)
+```
+ANS: Since the p value is much less than 0.05, we can conclude that the correlation is significant
+
+### b.Compute V_S(year=0) and V_S(year=1) for this new model (your formula should include covariance terms).
+ANS: 
+covariance = -0.45 * 19.25 * 10.44 = -90.
+V_S(Year=0) = 370.6 + 2 * 0 * (-90) + 0^2 * 109.1 = 370.6. 
+V_S(Year=1) = 370.6 + 2 * 1 * (-90) +1^2 * 109.1 = 299.7.
+     
+
+## Is this result (and thus model) more consistent with the separate grade analysis? You are implicitly testing model fit here.
+ANS: The calculated value for V_S(Year=0) is 370.6 where the actual between school variations 364.3. Also, the calculated value for V_S(Year=1) is 299.7 where the actual between school variance is about 306.6. As we can see, they are pretty similar, suggesting that the model is consistent with the separate grade analysis
