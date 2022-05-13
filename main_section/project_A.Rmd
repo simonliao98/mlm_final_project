@@ -92,7 +92,7 @@ b. Report change in variance components for all levels
 **Answer:** The change in $\sigma_\eta^2$ is `r as.data.frame(VarCorr(fit4))$vcov[1]`-`r as.data.frame(VarCorr(fit3))$vcov[1]` = `r as.data.frame(VarCorr(fit4))$vcov[1] - as.data.frame(VarCorr(fit3))$vcov[1]`, increases; the change in $\sigma_\zeta^2$ is `r as.data.frame(VarCorr(fit4))$vcov[2]`-`r as.data.frame(VarCorr(fit3))$vcov[2]` = `r as.data.frame(VarCorr(fit4))$vcov[2] - as.data.frame(VarCorr(fit3))$vcov[2]`, decreases; and change in $\sigma^2_\epsilon$ is `r as.data.frame(VarCorr(fit4))$vcov[3]`-`r as.data.frame(VarCorr(fit3))$vcov[3]` = `r as.data.frame(VarCorr(fit4))$vcov[3] - as.data.frame(VarCorr(fit3))$vcov[3]`, decreases.  
 
 c. Give a potential reason as to why the school level variance component drops from prior model  
-The aggregate effect of individual predictors account for school-level variance, as a result the school-level  variance component drops.  
+The aggregate effect of student predictors, can be seen as the school-level means and student deviation from the school mean. The school means would account for school-level variance, as a result the school-level variance component drops.  
 
 d. **WRITE OUT THIS MODEL** using your chosen notation (include assumptions).  
 
