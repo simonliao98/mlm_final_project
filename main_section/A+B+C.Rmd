@@ -340,7 +340,8 @@ dat <-
 ## Question 1
 ```{r question 1}
 # fit a model
-fit1 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (1|schoolid/classid), data = dat)
+fit1 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow +
+                         ses + sex + minority + (1|schoolid/classid), data = dat)
 summary(fit1)
 
 # plot residuals to test normality assumption
@@ -386,7 +387,9 @@ QQ plot shows that both sets of BLUPs of zeta0 and eta0 are around the line, and
 ```{r question 3}
 # a
 # add a random slope for minority, correlated with the random intercept, at the school level
-fit2 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (minority|schoolid) + (1 | classid), data = dat)
+fit2 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + 
+                         mathknow + ses + sex + minority + (minority|schoolid) + 
+                         (1 | classid), data = dat)
 print(summary(fit2))
 
 # b
@@ -453,7 +456,8 @@ $V_S = 169.45$, $V_C = 93.89$, and $V_E = 1064.96$.
 
 ```{r Question 4}
 # fit a model
-fit3 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses + sex + minority + (ses|schoolid) + (1 | classid), 
+fit3 <- lmerTest::lmer(math1st ~ housepov + yearstea + mathprep + mathknow + ses
+                       + sex + minority + (ses|schoolid) + (1 | classid), 
                        data = dat)
 summary(fit3)
 ```
@@ -482,8 +486,8 @@ require(foreign)
 dat<- read.csv('classroom.csv')
 dat$math0 <- dat$mathkind
 dat$math1 <- dat$mathkind + dat$mathgain
-class_pp <- reshape(dat, varying = c("math0", "math1"), v.names = "math", timevar = "year",
-times = c(0, 1), direction = "long")
+class_pp <- reshape(dat, varying = c("math0", "math1"), v.names = "math", 
+                    timevar = "year", times = c(0, 1), direction = "long")
 
 ```
 
@@ -538,7 +542,8 @@ ANS: The total variance in the fit1 is 348.7 + 1268.4 = 1617.1
 ## 4. Add a random slope (zeta1) for time trend (year) within schools (uncorrelated with random intercept (zeta0))
 ANS:
 ```{r}
-fit3 <- lmer(math ~ year + (year || schoolid) + (1 | schoolid:childid),data = class_pp)
+fit3 <- lmer(math ~ year + (year || schoolid) + (1 | schoolid:childid), 
+             data = class_pp)
 summary(fit3)
 ```
 
@@ -583,7 +588,8 @@ Based on the above summary table, we would say year1(364.3) has more between sch
 
 ## 6. Rerun the last nested longitudinal model, allowing correlation between intercept and slope.
 ```{r}
-fit4 <- lmer(math ~ year + (year | schoolid) + (1| schoolid:childid), data = class_pp)
+fit4 <- lmer(math ~ year + (year | schoolid) + (1| schoolid:childid), 
+             data = class_pp)
 summary(fit4)
 ```
 ### a. Is the correlation signif.?
